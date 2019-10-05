@@ -13,8 +13,10 @@ function makeGraphs(error, salesData) {
     region_selector(ndx);
     constituency_selector(ndx);
     elected_selector(ndx);
-    show_percent_that_are_professors(ndx, "F", "#percent-of-women-professors");
-    show_percent_that_are_professors(ndx, "M", "#percent-of-men-professors");
+    show_count_elected_by_gender(ndx, "F", "#count-of-women-elected");
+    show_count_elected_by_gender(ndx, "M", "#count-of-men-elected");
+    show_count_candidate_gender(ndx, "F", "#count-of-women-elected_1");
+    show_count_candidate_gender(ndx, "M", "#count-of-men-elected_1");
     party_first_preference_graphs(ndx);
     candidate_graphs(ndx);
 
@@ -70,12 +72,26 @@ function elected_selector(ndx) {
         .group(group);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function party_first_preference_graphs(ndx) {
 
     var dim = ndx.dimension(dc.pluck('Party_Abbreviation'));
     var group = dim.group().reduceSum(dc.pluck('Count_1'));
 
-    dc.pieChart('#party_first_preference_graphs') 
+    dc.pieChart('#party_first_preference_graphs')
         .height(360)
         .width(360)
         .innerRadius(95)
@@ -120,6 +136,51 @@ function candidate_graphs(ndx) {
 
 
 
+function show_count_elected_by_gender(ndx, gender, element) {
+    var countThatAreElected = ndx.groupAll().reduce(
+        function(p, v) {
+            if (v.Gender === gender) {
+                p.count++;
+                if (v.Result === "Elected") {
+                    p.are_elected++;
+                }
+            }
+            return p;
+        },
+        function(p, v) {
+            if (v.Gender === gender) {
+                p.count--;
+                if (v.Result === "Elected") {
+                    p.are_elected--;
+                }
+            }
+            return p;
+        },
+        function() {
+            return { count: 0, are_elected: 0 };
+        },
+    );
+
+
+    dc.numberDisplay(element)
+        // .formatNumber(d3.format("2.s"))
+        .valueAccessor(function(d) {
+            if (d.count == 0) {
+                return 0;
+            }
+            else {
+                return (d.are_elected);
+            }
+        })
+        .transitionDuration(1500)
+        .group(countThatAreElected)
+}
+
+
+
+
+
+
 
 
 
@@ -153,6 +214,47 @@ function candidate_graphs(ndx) {
 //this is the testing section 
 
 
+function show_count_candidate_gender(ndx, gender, element) {
+    var countThatArecandidate = ndx.groupAll().reduce(
+        function(p, v) {
+            if (v.Gender === gender) {
+                p.count++;
+                if (v.Result === "Excluded") {
+                    p.are_excluded++;
+                }
+            }
+            return p;
+        },
+        function(p, v) {
+            if (v.Gender === gender) {
+                p.count--;
+                if (v.Result === "Excluded") {
+                    p.are_excluded--;
+                }
+            }
+            return p;
+        },
+        function() {
+            return { count: 0, are_excluded: 0 };
+        },
+    );
+
+
+    dc.numberDisplay(element)
+        // .formatNumber(d3.format("2.s"))
+        .valueAccessor(function(d) {
+            if (d.count == 0) {
+                return 0;
+            }
+            else {
+                return (d.are_excluded);
+            }
+        })
+        .transitionDuration(1500)
+        .group(countThatArecandidate)
+}
+
+
 
 
 
@@ -172,7 +274,7 @@ function candidate_graphs_v2(ndx) {
 
     var partyGroup = party_color.group();
 
-    console.log(group.all());
+    // console.log(group.all());
 
 
     dc.barChart("#candidate-graph-v2")
@@ -323,43 +425,7 @@ function candidate_total_votes_graphs(ndx) {
 
 // Everything under here is in test
 
-function show_percent_that_are_professors(ndx, gender, element) {
-    var percentageThatAreProf = ndx.groupAll().reduce(
-        function(p, v) {
-            if (v.Gender === gender) {
-                p.count++;
-                if (v.Result === "Elected") {
-                    p.are_prof++;
-                }
-            }
-            return p;
-        },
-        function(p, v) {
-            if (v.Gender === gender) {
-                p.count--;
-                if (v.Result === "Elected") {
-                    p.are_prof--;
-                }
-            }
-            return p;
-        },
-        function() {
-            return { count: 0, are_prof: 0 };
-        },
-    );
 
-    dc.numberDisplay(element)
-        .formatNumber(d3.format(".2%"))
-        .valueAccessor(function(d) {
-            if (d.count == 0) {
-                return 0;
-            }
-            else {
-                return (d.are_prof / d.count);
-            }
-        })
-        .group(percentageThatAreProf)
-}
 
 
 
