@@ -7,31 +7,41 @@ queue()
 function makeGraphs(error, salesData) {
     var ndx = crossfilter(salesData);
 
+
+
+    // these are the working graphs 
     region_selector(ndx);
     constituency_selector(ndx);
     elected_selector(ndx);
+    show_percent_that_are_professors(ndx, "F", "#percent-of-women-professors");
+    show_percent_that_are_professors(ndx, "M", "#percent-of-men-professors");
     party_first_preference_graphs(ndx);
+    candidate_graphs(ndx);
+
+
+
+
+
+
+    // these are the graphs in test     
+
     party_total_votes_graphs(ndx);
     candidate_first_preferance_graphs(ndx);
     candidate_total_votes_graphs(ndx);
-    candidate_graphs(ndx);
     candidate_graphs_v2(ndx);
-
-    show_percent_that_are_professors(ndx, "F", "#percent-of-women-professors");
-    show_percent_that_are_professors(ndx, "M", "#percent-of-men-professors");
-
-
-
 
 
     dc.renderAll();
 }
 
 
+// This is the working section 
+
+
+
 function refreshPage() {
     window.location.reload();
 }
-
 
 function region_selector(ndx) {
     var dim = ndx.dimension(dc.pluck('Region'));
@@ -60,26 +70,23 @@ function elected_selector(ndx) {
         .group(group);
 }
 
-
-
-
 function party_first_preference_graphs(ndx) {
 
     var dim = ndx.dimension(dc.pluck('Party_Abbreviation'));
     var group = dim.group().reduceSum(dc.pluck('Count_1'));
 
-    dc.pieChart('#party_first_preference_graphs') /* targeting the div where we want the pie chart*/
+    dc.pieChart('#party_first_preference_graphs') 
         .height(360)
         .width(360)
         .innerRadius(95)
         .transitionDuration(1500)
-        .colors(d3.scale.ordinal().range(["#e6550e", "#fd8c3d", "#3182bc", "#fd8c3d", "#fd8c3d", "#fd8c3d", "#fd8c3d"]))
+        .colors(d3.scale.ordinal().range(["#8B8C8A", "#00A3DF", "#12A853", "#014B45", "#D6323D", "#91B905"]))
         .dimension(dim)
         .renderLabel(true)
         .legend(dc.legend().x(150).y(130).itemHeight(14).gap(5))
         .title(function(d) {
             return d.key + ": " + ((d.value / d3.sum(group.all(),
-                function(d) { return d.value; })) * 100).toFixed(0) + "%";
+                function(d) { return d.value; })) * 100).toFixed(2) + "%";
         })
         .on("pretransition", function(chart) {
             chart.selectAll("text.pie-slice").text(function(d) {
@@ -91,53 +98,22 @@ function party_first_preference_graphs(ndx) {
                         (2 * Math.PI) * 100) + "%";
                 }
             })
-            // chart.select("svg")
-            //     .attr("height", "100%")
-            //     .attr("width", "100%")
-            //     .attr("viewBox", "0 0 360 360");
-            chart.selectAll(".dc-legend-item text")
-                .attr("fill", "#1D47FF")
-                .text("")
-                .append("tspan")
-                .text(function(d) { return d.name; })
-                .attr("x", 70)
-                .attr("text-anchor", "end");
         })
         .group(group);
 }
-
-
-function party_total_votes_graphs(ndx) {
-    var dim = ndx.dimension(dc.pluck('Party_Abbreviation'));
-    var group = dim.group().reduceSum(dc.pluck('Seat'));
-
-    dc.pieChart('#party_total_votes_graphs') /* targeting the div where we want the pie chart*/
-        .height(360)
-        .width(360)
-        .innerRadius(95)
-        .transitionDuration(1500)
-        // .colors(d3.scale.ordinal().range(["#3182bc", "#fd8c3d", "#e6550e"]))
-        .dimension(dim)
-        .renderLabel(true)
-        .legend(dc.legend().x(150).y(130).itemHeight(14).gap(5))
-        // .radius(360)
-        .group(group)
-        .title();
-}
-
-
 
 
 function candidate_graphs(ndx) {
     var dim = ndx.dimension(dc.pluck('Party_Abbreviation'));
     var group = dim.group().reduceSum(dc.pluck('Seat'));
 
-       dc.rowChart("#candidate-graph")
+    dc.rowChart("#candidate-graph")
         .width(600)
-        .colors(d3.scale.ordinal().range(["#e6550e", "#fd8c3d", "#3182bc", "#fd8c3d", "#fd8c3d", "#fd8c3d", "#fd8c3d"]))
-        .height(300)
+        .height(400)
+        .colors(d3.scale.ordinal().range(["#00A3DF", "#12A853", "#8B8C8A", "#014B45", "#D6323D", "#91B905"]))
         .margins({ top: 10, right: 50, bottom: 30, left: 50 })
         .dimension(dim)
+        .transitionDuration(1500)
         .elasticX(true)
         .group(group);
 }
@@ -149,6 +125,32 @@ function candidate_graphs(ndx) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//this is the testing section 
 
 
 
@@ -170,7 +172,7 @@ function candidate_graphs_v2(ndx) {
 
     var partyGroup = party_color.group();
 
-      console.log(group.all());
+    console.log(group.all());
 
 
     dc.barChart("#candidate-graph-v2")
@@ -193,6 +195,23 @@ function candidate_graphs_v2(ndx) {
 }
 
 
+function party_total_votes_graphs(ndx) {
+    var dim = ndx.dimension(dc.pluck('Party_Abbreviation'));
+    var group = dim.group().reduceSum(dc.pluck('Seat'));
+
+    dc.pieChart('#party_total_votes_graphs') /* targeting the div where we want the pie chart*/
+        .height(360)
+        .width(360)
+        .innerRadius(95)
+        .transitionDuration(1500)
+        // .colors(d3.scale.ordinal().range(["#3182bc", "#fd8c3d", "#e6550e"]))
+        .dimension(dim)
+        .renderLabel(true)
+        .legend(dc.legend().x(150).y(130).itemHeight(14).gap(5))
+        // .radius(360)
+        .group(group)
+        .title();
+}
 
 
 
