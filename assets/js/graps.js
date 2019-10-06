@@ -19,6 +19,9 @@ function makeGraphs(error, salesData) {
     show_count_candidate_gender(ndx, "M", "#count-of-men-elected_1");
     party_first_preference_graphs(ndx);
     candidate_graphs(ndx);
+    
+
+
 
 
 
@@ -31,6 +34,7 @@ function makeGraphs(error, salesData) {
     candidate_first_preferance_graphs(ndx);
     candidate_total_votes_graphs(ndx);
     candidate_graphs_v2(ndx);
+    // candidate_people(ndx);
 
 
     dc.renderAll();
@@ -126,11 +130,12 @@ function candidate_graphs(ndx) {
     dc.rowChart("#candidate-graph")
         .width(600)
         .height(400)
-        .colors(d3.scale.ordinal().range(["#00A3DF", "#12A853", "#8B8C8A", "#014B45", "#D6323D", "#91B905"]))
+        .colors(d3.scale.ordinal().range(["#91B905", "#D6323D", "#014B45", "#8B8C8A", "#12A853", "#00A3DF"]))
         .margins({ top: 10, right: 50, bottom: 30, left: 50 })
         .dimension(dim)
         .transitionDuration(1500)
         .elasticX(true)
+              .ordering(function(d) { return +d.value })
         .group(group);
 }
 
@@ -211,7 +216,119 @@ function show_count_elected_by_gender(ndx, gender, element) {
 
 
 
+
+
 //this is the testing section 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function candidate_people(ndx) {
+//     var dim = ndx.dimension(dc.pluck('Candidate'));
+//     var group = dim.group().reduceSum(dc.pluck('Count_1' ));
+//     var group2 = dim.group().reduceSum(dc.pluck('Result' ));
+
+//     console.log(dim)
+
+//     dc.rowChart("#candidate-people")
+//         .width(600)
+//         .height(8600)
+
+//         .margins({ top: 10, right: 50, bottom: 30, left: 50 })
+//         .dimension(dim)
+//         .transitionDuration(1500)
+//         // .elasticX(true)
+//         .group(group,group2);
+
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function show_count_candidate_gender(ndx, gender, element) {
