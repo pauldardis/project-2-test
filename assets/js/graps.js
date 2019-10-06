@@ -19,6 +19,7 @@ function makeGraphs(error, salesData) {
     show_count_candidate_gender(ndx, "M", "#count-of-men-elected_1");
     party_first_preference_graphs(ndx);
     candidate_graphs(ndx);
+    show_data_table(ndx) 
     
 
 
@@ -220,7 +221,87 @@ function show_count_elected_by_gender(ndx, gender, element) {
 
 //this is the testing section 
 
+function show_data_table(ndx) {
 
+    var dim = ndx.dimension(function(d) { return d.dim; });
+
+    var table = dc.dataTable("#dc-data-table") /* variable created for pagination */
+
+        .dimension(dim)
+        .group(function(d) { return ""; })
+        // .size(Infinity) /* Adjust amount of rows here. Use 'Infinity' to show all data */
+
+        .columns([
+            function(d) { return d.Constituency_Name; },
+            function(d) { return d.Candidate; },
+            function(d) { return d.Gender; },
+            function(d) { return d.Party; },
+            function(d) { return d.Party_Abbreviation; },
+            function(d) { return d.Party_Abbreviation_v2; },
+            function(d) { return d.Seat; },
+            function(d) { return d.Result; }
+
+        ]).sortBy(function(d) {
+            return d.Constituency_Name; /* sortBy return = d.Constituency_Name will sort data by Constituency_Names */
+        })
+        .order(d3.descending) /* reinsert ; after final peice of this section */
+
+        /* pagination */ 
+
+        .on('preRender', update_offset)
+        .on('preRedraw', update_offset)
+        .on('pretransition', display);
+
+
+    /* use odd pParty_Abbreviation_v2 size to show the effect better */
+    var ofs = 0,
+        pag = 7;
+
+    function update_offset() {
+        var totFilteredRecs = ndx.groupAll().value();
+        var end = ofs + pag > totFilteredRecs ? totFilteredRecs : ofs + pag;
+        ofs = ofs >= totFilteredRecs ? Math.floor((totFilteredRecs - 1) / pag) * pag : ofs;
+        ofs = ofs < 0 ? 0 : ofs;
+        table.beginSlice(ofs); /*table used as variable for dc.dataTable("#dc-data-table") */
+        table.endSlice(ofs + pag); /*table used as variable for dc.dataTable("#dc-data-table")*/
+    }
+
+    function display() {
+        var totFilteredRecs = ndx.groupAll().value();
+        var end = ofs + pag > totFilteredRecs ? totFilteredRecs : ofs + pag;
+        d3.select('#begin')
+            .text(end === 0 ? ofs : ofs + 1);
+        d3.select('#end')
+            .text(end);
+        d3.select('#last')
+            .attr('disabled', ofs - pag < 0 ? 'true' : null);
+        d3.select('#next')
+            .attr('disabled', ofs + pag >= totFilteredRecs ? 'true' : null);
+        d3.select('#size').text(totFilteredRecs);
+        if (totFilteredRecs != ndx.size()) {
+            d3.select('#totalsize').text("(filtered Total: " + ndx.size() + " )");
+        }
+        else {
+            d3.select('#totalsize').text('');
+        }
+    }
+
+    // $('#next').on('click', function() {
+    //     ofs += pag;
+    //     update_offset();
+    //     table.redraw();
+    // });
+    /* Event Listener function that fires when "next" HTML btn is clicked */  
+
+
+    // $('#last').on('click', function() {
+    //     ofs -= pag;
+    //     update_offset();
+    //     table.redraw();
+    // });
+    /* Event Listener function that fires when "last" HTML btn is clicked */
+
+}
 
 
 
